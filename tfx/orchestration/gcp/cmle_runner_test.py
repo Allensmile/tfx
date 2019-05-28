@@ -18,6 +18,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import sys
 # Standard Imports
 import mock
 import tensorflow as tf
@@ -81,14 +82,18 @@ class CmleRunnerTest(tf.test.TestCase):
     body = kwargs['body']
     self.assertDictContainsSubset(
         {
-            'pythonVersion': cmle_runner._get_caip_python_version(),
-            'runtimeVersion': '.'.join(tf.__version__.split('.')[0:2]),
-            'jobDir': self._job_dir,
+            'pythonVersion':
+                '%d.%d' % (sys.version_info.major, sys.version_info.minor),
+            'runtimeVersion':
+                '.'.join(tf.__version__.split('.')[0:2]),
+            'jobDir':
+                self._job_dir,
             'args': [
                 '--executor_class_path', class_path, '--inputs', '{}',
                 '--outputs', '{}', '--exec-properties', '{"custom_config": {}}'
             ],
-            'pythonModule': 'tfx.scripts.run_executor',
+            'pythonModule':
+                'tfx.scripts.run_executor',
             'packageUris': [os.path.join(self._job_dir, 'fake_package')],
         }, body['trainingInput'])
     self.assertStartsWith(body['jobId'], 'tfx_')
@@ -122,7 +127,7 @@ class CmleRunnerTest(tf.test.TestCase):
             'name': 'v{}'.format(model_version),
             'deployment_uri': serving_path,
             'runtime_version': cmle_runner._get_tf_runtime_version(),
-            'python_version': cmle_runner._get_caip_python_version(),
+            'python_version': cmle_runner._get_python_version(),
         }, body)
     mock_get.assert_called_with(name='op_name')
 
